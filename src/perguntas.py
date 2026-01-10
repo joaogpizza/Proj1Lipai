@@ -1,4 +1,4 @@
-""" Contém a classe Pergunta e métodos para salvar estas. """
+""" Contém a classe Pergunta e métodos para salvar e carregar estas. """
 
 import os
 import csv

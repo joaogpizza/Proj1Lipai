@@ -1,4 +1,4 @@
-""" Contém a classe Quiz e métodos para salvar estes. """
+""" Contém a classe Quiz e métodos para salvar e carregar estes. """
 
 import os
 import csv
@@ -102,6 +102,8 @@ def carregar_quizzes(lista_arq_perguntas):
             for pergunta in lista_arq_perguntas:
                 if pergunta.id in lista_ids_perguntas:
                     lista_perguntas.append(pergunta)
+            if len(lista_perguntas) != len(lista_ids_perguntas):
+                raise ValueError(f'Alguma pergunta do quiz da linha {numero_linha} não existe')
             quiz = Quiz(idq, titulo, lista_perguntas)
             quizzes.append(quiz)
     return quizzes
