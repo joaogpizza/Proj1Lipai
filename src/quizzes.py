@@ -2,25 +2,25 @@
 
 import os
 import csv
+import perguntas
 
 PATH_CSV = os.path.join((os.path.dirname(os.path.abspath(__file__))), '..', 'data', 'quizzes.csv')
 TAMANHO_MINIMO = 2
 
 class Quiz:
     """ Classe que lida com quizzes """
-    def __init__(self, idq, titulo, lista_ids_perguntas):
+    def __init__(self, idq, titulo, lista_perguntas):
         self.idq = idq
         self.titulo = titulo
-        self.lista_ids_perguntas = lista_ids_perguntas
+        self.lista_perguntas = lista_perguntas
     def para_csv(self):
         """ Transforma um Quiz em uma linha csv """
-        return [
-            str(self.idq),
-            self.titulo,
-            *self.lista_ids_perguntas
-        ]
+        resultado = [str(self.idq), self.titulo]
+        for pergunta in self.lista_perguntas:
+            resultado.append(str(pergunta.idp))
+        return resultado
     def __str__(self):
-        return f'{self.idq}: {self.titulo}, {len(self.lista_ids_perguntas)} perguntas;'
+        return f'{self.idq}: {self.titulo}, {len(self.lista_perguntas)} perguntas;'
     def __eq__(self, value):
         if isinstance(value, self.__class__):
             return value.idq == self.idq
@@ -49,18 +49,18 @@ class Quiz:
             raise ValueError('titulo invalido')
         self._titulo = titulo
     @property
-    def lista_ids_perguntas(self):
+    def lista_perguntas(self):
         """ Getter de lista_perguntas """
-        return self._lista_ids_perguntas
-    @lista_ids_perguntas.setter
-    def lista_ids_perguntas(self, valor):
+        return self._lista_perguntas
+    @lista_perguntas.setter
+    def lista_perguntas(self, valor):
         """ 
         Pode levantar ValueError caso lista_perguntas não seja uma lista de Perguntas ou  
         seja uma vazia
         """
-        if not isinstance(valor, list[int]) or not valor:
-            raise ValueError('lista_ids_perguntas invalida')
-        self._lista_ids_perguntas = valor
+        if not isinstance(valor, list[perguntas.Pergunta]) or not valor:
+            raise ValueError('lista_perguntas invalida')
+        self._lista_perguntas = valor
 
 def salvar_quiz(quiz):
     """
@@ -70,12 +70,14 @@ def salvar_quiz(quiz):
         escritor = csv.writer(arq)
         escritor.writerow(quiz.para_csv())
 
-def carregar_quizzes():
+def carregar_quizzes(lista_arq_perguntas):
     """
     Retorna um vetor com todos os quizzes em data/quizzes.csv como entidades 
     da classe Quiz, pode levantar ValueError caso uma linha não esteja de acordo
     com os conformes.
     """
+    if not lista_arq_perguntas:
+        return []
     quizzes = []
     numero_linha = 0
     with PATH_CSV.open(newline = '', encoding = 'utf-8') as arq:
@@ -85,6 +87,7 @@ def carregar_quizzes():
             if not linha or all(cedula.strip() == '' for cedula in linha):
                 continue
             lista_ids_perguntas = []
+            lista_perguntas = []
             if len(linha) < TAMANHO_MINIMO:
                 raise ValueError(f'Linha {numero_linha} está errada')
             idq = int(linha[0])
@@ -96,6 +99,9 @@ def carregar_quizzes():
                 lista_ids_perguntas.append(int(cedula))
             if not lista_ids_perguntas:
                 raise ValueError(f'Quiz {numero_linha} sem perguntas')
-            pergunta = Quiz(idq, titulo, lista_ids_perguntas)
-            quizzes.append(pergunta)
+            for pergunta in lista_arq_perguntas:
+                if pergunta.id in lista_ids_perguntas:
+                    lista_perguntas.append(pergunta)
+            quiz = Quiz(idq, titulo, lista_perguntas)
+            quizzes.append(quiz)
     return quizzes
