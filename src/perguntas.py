@@ -22,6 +22,12 @@ class Pergunta:
             *self.alternativas,
             self.alternativa_correta
         ]
+    def em_linha(self):
+        """ 
+        Converte a pergunta em uma linha do tipo 'idp: enunciado', para não lotar 
+        a tela de listagem de perguntas
+        """
+        return f'{self.idp}: {self.enunciado}'
     def __str__(self):
         resultado = f'{self.enunciado}\n'
         for i in range(0, NUMERO_ALTERNATIVAS):
@@ -41,6 +47,19 @@ class Pergunta:
         if ord(chute) not in range(65, 65+NUMERO_ALTERNATIVAS):
             raise ValueError('Valor não corresponde a uma alternativa')
         return self.alternativa_correta == chute
+    def aplicar_pergunta(self):
+        """ Aplica uma pergunta e fica em um loop até receber uma resposta válida """
+        print(self)
+        while True:
+            resposta = input('Digite a alternativa que julgar correta: ')
+            try:
+                acertou = self.respondeu_certo(resposta)
+                break
+            except Exception as e:
+                print(e)
+        if acertou:
+            return 1
+        return 0
     # Getters e Setters
     @property
     def idp(self):
@@ -118,7 +137,7 @@ def carregar_perguntas():
             alternativas = []
             if len(linha) != TAMANHO_ESPERADO:
                 raise ValueError(f'Linha {numero_linha} está errada')
-            idp = int(linha[0])
+            idp = int(linha[0].strip())
             enunciado = linha[1]
             for i in range(0, NUMERO_ALTERNATIVAS):
                 alternativas.append(linha[2+i])
