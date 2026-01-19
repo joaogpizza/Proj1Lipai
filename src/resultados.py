@@ -6,7 +6,7 @@ from datetime import datetime
 import quizzes
 
 PATH_CSV = os.path.join((os.path.dirname(os.path.abspath(__file__))), '..', 'data', 'resultados.csv')
-TAMANHO_ESPERADO = 4
+TAMANHO_ESPERADO = 5
 
 class Resultado:
     """ Classe que lida com resultados """
@@ -104,7 +104,7 @@ def salvar_resultados(resultado):
     """
     Salva o resultado resultado em data/resultados.csv
     """
-    with PATH_CSV.open(newline = '', encoding = 'utf-8') as arq:
+    with open(PATH_CSV, 'a', newline = '', encoding = 'utf-8') as arq:
         escritor = csv.writer(arq)
         escritor.writerow(resultado.para_csv())
 
@@ -118,19 +118,19 @@ def carregar_resultados(lista_arq_quizzes):
         return []
     resultados = []
     numero_linha = 0
-    with PATH_CSV.open(newline = '', encoding = 'utf-8') as arq:
-        leitor = csv.reader(arq, delimiter = ';')
+    with open(PATH_CSV, newline = '', encoding = 'utf-8') as arq:
+        leitor = csv.reader(arq, delimiter = ',')
         for linha in leitor:
             numero_linha += 1
             if not linha:
                 continue
             if len(linha) != TAMANHO_ESPERADO:
-                raise ValueError(f'Linha {numero_linha} invalida')
-            idr = int(linha[0])
-            idq = int(linha[1])
+                raise ValueError(f'(Resultados) Linha {numero_linha} invalida')
+            idr = int(linha[0].strip())
+            idq = int(linha[1].strip())
             nome_participante = linha[2]
-            nota = int(linha[3])
-            data = linha[4]
+            nota = int(linha[3].strip())
+            data = linha[4].strip()
             achou_quiz = False
             for quiz in lista_arq_quizzes:
                 if quiz.idq == idq:

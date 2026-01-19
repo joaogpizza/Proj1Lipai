@@ -52,10 +52,13 @@ class Pergunta:
         print(self)
         while True:
             resposta = input('Digite a alternativa que julgar correta: ')
+            if len(resposta.strip()) != 1:
+                print('Digite uma alternativa válida.')
+                continue
             try:
                 acertou = self.respondeu_certo(resposta)
                 break
-            except Exception as e:
+            except ValueError as e:
                 print(e)
         if acertou:
             return 1
@@ -92,7 +95,7 @@ class Pergunta:
         o número de alternativas não seja o esperado ou tenha pelo menos uma 
         alternativa vazia.
         """
-        if not isinstance(alternativas, list[str]) or len(alternativas) != NUMERO_ALTERNATIVAS:
+        if not (isinstance(alternativas, list) and all(isinstance(i, str) for i in alternativas)) or len(alternativas) != NUMERO_ALTERNATIVAS:
             raise ValueError('alternativas invalida')
         for i in range(0, NUMERO_ALTERNATIVAS):
             if not (alternativas[i]).strip():
@@ -108,7 +111,9 @@ class Pergunta:
         Pode levantar ValueError caso alternativa_correta não seja um char válido 
         ou seja um vazio.
         """
-        if not isinstance(alternativa_correta, str) or len(alternativa_correta.split()) != 1 or ord(alternativa_correta) not in range(65, 65+NUMERO_ALTERNATIVAS):
+        if not isinstance(alternativa_correta, str) or len(alternativa_correta) != 1:
+            raise ValueError('alternativa_correta invalida')
+        if ord(alternativa_correta) not in range(65, 65+NUMERO_ALTERNATIVAS):
             raise ValueError('alternativa_correta invalida')
         self._alternativa_correta = alternativa_correta
 
@@ -116,7 +121,7 @@ def salvar_pergunta(perg):
     """
     Salva a pergunta perg em data/perguntas.csv.
     """
-    with PATH_CSV.open(newline = '', encoding = 'utf-8') as arq:
+    with open(PATH_CSV, 'a', newline = '', encoding = 'utf-8') as arq:
         escritor = csv.writer(arq)
         escritor.writerow(perg.para_csv())
 
@@ -128,15 +133,15 @@ def carregar_perguntas():
     """
     perguntas = []
     numero_linha = 0
-    with PATH_CSV.open(newline = '', encoding = 'utf-8') as arq:
-        leitor = csv.reader(arq, delimiter = ';')
+    with open(PATH_CSV, newline = '', encoding = 'utf-8') as arq:
+        leitor = csv.reader(arq, delimiter = ',')
         for linha in leitor:
             numero_linha += 1
             if not linha:
                 continue
             alternativas = []
             if len(linha) != TAMANHO_ESPERADO:
-                raise ValueError(f'Linha {numero_linha} está errada')
+                raise ValueError(f'(Perguntas) Linha {numero_linha} está errada')
             idp = int(linha[0].strip())
             enunciado = linha[1]
             for i in range(0, NUMERO_ALTERNATIVAS):

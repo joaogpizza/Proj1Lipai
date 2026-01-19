@@ -58,7 +58,7 @@ class Quiz:
         Pode levantar ValueError caso lista_perguntas não seja uma lista de Perguntas ou  
         seja uma vazia
         """
-        if not isinstance(valor, list[perguntas.Pergunta]) or not valor:
+        if not (isinstance(valor, list) and all(isinstance(i, perguntas.Pergunta) for i in valor)) or not valor:
             raise ValueError('lista_perguntas invalida')
         self._lista_perguntas = valor
 
@@ -66,7 +66,7 @@ def salvar_quiz(quiz):
     """
     Salva o quiz quiz em data/quizzes.csv.
     """
-    with PATH_CSV.open(newline = '', encoding = 'utf-8') as arq:
+    with open(PATH_CSV, 'a', newline = '', encoding = 'utf-8') as arq:
         escritor = csv.writer(arq)
         escritor.writerow(quiz.para_csv())
 
@@ -80,8 +80,8 @@ def carregar_quizzes(lista_arq_perguntas):
         return []
     quizzes = []
     numero_linha = 0
-    with PATH_CSV.open(newline = '', encoding = 'utf-8') as arq:
-        leitor = csv.reader(arq, delimiter = ';')
+    with open(PATH_CSV, newline = '', encoding = 'utf-8') as arq:
+        leitor = csv.reader(arq, delimiter = ',')
         for linha in leitor:
             numero_linha += 1
             if not linha or all(cedula.strip() == '' for cedula in linha):
@@ -89,8 +89,8 @@ def carregar_quizzes(lista_arq_perguntas):
             lista_ids_perguntas = []
             lista_perguntas = []
             if len(linha) < TAMANHO_MINIMO:
-                raise ValueError(f'Linha {numero_linha} está errada')
-            idq = int(linha[0])
+                raise ValueError(f'(Quizzes) Linha {numero_linha} está errada')
+            idq = int(linha[0].strip())
             titulo = linha[1]
             for cedula_original in linha[2:]:
                 cedula = cedula_original.strip()
@@ -100,7 +100,7 @@ def carregar_quizzes(lista_arq_perguntas):
             if not lista_ids_perguntas:
                 raise ValueError(f'Quiz {numero_linha} sem perguntas')
             for pergunta in lista_arq_perguntas:
-                if pergunta.id in lista_ids_perguntas:
+                if pergunta.idp in lista_ids_perguntas:
                     lista_perguntas.append(pergunta)
             if len(lista_perguntas) != len(lista_ids_perguntas):
                 raise ValueError(f'Alguma pergunta do quiz da linha {numero_linha} não existe')
