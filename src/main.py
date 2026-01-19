@@ -7,6 +7,7 @@ import resultados
 
 # Métodos do menu
 def cadastrar_pergunta(idp):
+    """ Lida com a opção de cadastrar perguntas, salvando e retornando a pergunta cadastrada. """
     enunciado = input('Digite o enunciado: ')
     alternativas = []
     for i in range(0, perguntas.NUMERO_ALTERNATIVAS):
@@ -23,6 +24,7 @@ def cadastrar_pergunta(idp):
     return pergunta
 
 def montar_quizzes(idq, lista_perguntas):
+    """ Lida com a opção de montar quizzes, salvando e retornando o quiz criado. """
     titulo = input('Digite o titulo do quiz: ')
     while True:
         try:
@@ -53,6 +55,7 @@ def montar_quizzes(idq, lista_perguntas):
     return quiz
 
 def aplicar_quiz(idr, lista_quizzes):
+    """ Lida com a opção de aplicar quiz, salvando e retornando o resultado obtido. """
     for quiz in lista_quizzes:
         print(quiz)
     while True:
@@ -70,19 +73,26 @@ def aplicar_quiz(idr, lista_quizzes):
     soma = 0
     for pergunta in quiz.lista_perguntas:
         soma += pergunta.aplicar_pergunta()
+        print('------')
     resultado = resultados.Resultado(idr, quiz, nome_participante, soma, data)
     resultados.salvar_resultados(resultado)
     print(f'Resultado salvo com id {idr}')
     return resultado
 
 def ver_resultados(lista_resultados):
+    """ Lida com a opção de visualizar resultados. """
     if not lista_resultados:
         print('Sem resultados registrados.')
     else:
         for resultado in lista_resultados:
             print(resultado)
+            print('------')
 
 def escolha(quantidade_escolhas):
+    """ 
+    Lida com inputs do tipo 'Digite a opção desejada: ', sendo esta um número entre 
+    0 e quantidade_escolhas. 
+    """
     while True:
         try:
             tentativa = int(input('Digite a opção desejada: '))
@@ -93,6 +103,7 @@ def escolha(quantidade_escolhas):
             print('Digite uma opção válida.')
 
 def sair():
+    """ Lida com a saida do programa. """
     print('Deseja mesmo sair?')
     print('(0) Sim')
     print('(1) Não')
@@ -103,6 +114,7 @@ def sair():
     return False
 
 def mais_alguma_coisa():
+    """ Questiona se o usuário quer fazer mais algo. """
     print('Mais alguma coisa?')
     print('(0) Sim')
     print('(1) Não')
