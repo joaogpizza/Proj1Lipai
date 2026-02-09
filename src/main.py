@@ -45,7 +45,7 @@ def montar_quizzes(idq, lista_perguntas):
                 if idp < 0 or idp > len(lista_perguntas)-1:
                     print('Digite um id válido.')
                     continue
-                perguntas_quiz.append(lista_perguntas[i])
+                perguntas_quiz.append(lista_perguntas[idp])
                 break
             except ValueError:
                 print('Digite um id válido.')
